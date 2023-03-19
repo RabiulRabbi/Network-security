@@ -1,43 +1,67 @@
 #include<bits/stdc++.h>
 using namespace std;
-int arr_key[100000];
-int modInverse(int A, int M)
-{
-    for (int X = 1; X < M; X++)
-        if (((A % M) * (X % M)) % M == 1)
-            return X;
-}
-string encrypt(string s, int key1,int key2)
-{
-    int n = s.size();
-    for(int i = 0; i < n; i++){
-        s[i] = (((s[i]-'a')*key1)+key2)%26 + 'A';
-    }
-    return s;
-}
-string decrypt(string s, int key1,int key2)
-{
-    int n = s.size();
-    int mod = modInverse(key1,26);
-    for(int i = 0; i < n; i++){
-        s[i] = (((s[i]-'A' - key2 + 26)%26) * mod)%26 + 'a';
-    }
-    return s;
-}
+
+string encryption_affine(string plainText, int k1, int k2);
+string decryption_affine(string cipherText, int k1, int k2);
+int multiplicativeInverse(int k1);
+
 int main()
 {
-	string plain_text;
-	int key1, key2;
-	cin >> plain_text >> key1 >> key2;
-	int n = plain_text.size();
-	if(__gcd(key1,26)!=1){
-        cout << "No Multiplicative inverse of key 1";
-        return 0;
-	}
-	string cipher_text = encrypt(plain_text,key1,key2);
-	cout << cipher_text << endl;
-	plain_text = decrypt(cipher_text,key1, key2);
-	cout << plain_text << "\n";
-	return 0;
+
+
+    string plainText;
+    cout << "Enter the plain text: ";
+    cin >> plainText;
+
+    int k1, k2;
+    cout << "Enter the keys: ";
+    cin >> k1 >> k2;
+    int multiplicativeInverse(int k1);
+    while(multiplicativeInverse(k1) == -1)
+    {
+        cout << "There is no multiplicative inverse for " << k1<<  ".\nEnter valid keys: ";
+        cin >> k1 >> k2;
+    }
+
+    string cipherText = encryption_affine(plainText, k1, k2);
+    cout << "The cipherText is: " << cipherText << "\n";
+
+    string decipherText = decryption_affine(cipherText, k1, k2);
+    cout << "The decipherText is: " << decipherText << "\n";
+
+    return 0;
 }
 
+string encryption_affine(string plainText, int k1, int k2)
+{
+    string cipherText = "";
+    for(int i=0; i<plainText.size(); i++)
+    {
+        cipherText += (((plainText[i] - 'a') * k1) + k2) % 26 + 'A';
+    }
+
+    return cipherText;
+}
+
+string decryption_affine(string cipherText, int k1, int k2)
+{
+    int k1_inverse = multiplicativeInverse(k1);
+
+    string decipherText = "";
+    for(int i=0; i<cipherText.size(); i++)
+    {
+        decipherText += (((cipherText[i] + 'A' - k2) * k1_inverse)) % 26 + 'a';
+    }
+    return decipherText;
+}
+
+int multiplicativeInverse(int k1)
+{
+    for(int i=1; i<26; i++)
+    {
+        if((k1 * i) % 26 == 1)
+            return i;
+    }
+
+    return -1;
+}
